@@ -61,6 +61,7 @@ const Home = () => {
     inputName.current.value = "";
     inputAge.current.value = "";
     inputEmail.current.value = "";
+    passwordRef.current.value = "";
   };
 
   //Buscar usuário específico selecionado
@@ -90,17 +91,21 @@ const Home = () => {
   const updateUsers = async (e) => {
     const id = userID;
     try {
-      await api.put(`/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-
-        name: inputName.current.value,
-        age: inputAge.current.value,
-        email: inputEmail.current.value,
-      });
-      e.preventDefault();
+      await api.put(
+        `/users/${id}`,
+        {
+          name: inputName.current.value,
+          age: Number(inputAge.current.value),
+          email: inputEmail.current.value,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       inputAge.current.value = "";
       inputName.current.value = "";
       inputEmail.current.value = "";
+      e.preventDefault();
       setShowEditForm(false);
       alert("User updated Successfully! ");
     } catch (error) {
@@ -141,6 +146,12 @@ const Home = () => {
             name="email"
             type="email"
             ref={inputEmail}
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            name="password"
+            ref={passwordRef}
           />
           <button type="button" onClick={createUsers}>
             Cadastrar
