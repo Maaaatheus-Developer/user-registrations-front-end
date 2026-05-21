@@ -19,7 +19,8 @@ const Login = () => {
       const token = data.token;
       localStorage.setItem("token", token);
       alert("User logged Successfully.");
-      navigate("/list-of-user");
+      // navigate("/list-of-user");
+      navigate("/home");
     } catch (err) {
       console.error(err);
       alert("Senha ou email incorretos 🙁");
@@ -50,7 +51,7 @@ const Login = () => {
       </form>
 
       <Link
-        to="/"
+        to="/home"
         className="text-blue-700 hover:underline text-center mt-4 block"
       >
         Não tem uma conta? Cadastre-se

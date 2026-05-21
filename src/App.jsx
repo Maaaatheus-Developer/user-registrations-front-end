@@ -16,10 +16,11 @@ const AppRoutes = () => {
     <>
       {showHeader && <Header />}
       <Routes>
-        <Route path="/" element={<Register />} />
+        {/* <Route path="/" element={<Register />} /> */}
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/list-of-user" element={<ListOfUsers />} />
+          {/* <Route path="/list-of-user" element={<ListOfUsers />} /> */}
           <Route path="/home" element={<Home />} />
         </Route>
       </Routes>

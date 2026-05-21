@@ -45,23 +45,59 @@ const Home = () => {
 
   //Criar usuários
   const createUsers = async () => {
+    // Validar campos vazios
+    const name = inputName.current?.value.trim() ?? "";
+    const age = inputAge.current?.value.trim() ?? "";
+    const email = inputEmail.current?.value.trim() ?? "";
+    const password = passwordRef.current?.value.trim() ?? "";
+
+    // Validações específicas
+    if (name === "") {
+      window.alert("Por favor, preencha o campo Nome!");
+      return;
+    }
+    if (age === "") {
+      window.alert("Por favor, preencha o campo Idade!");
+      return;
+    }
+    if (isNaN(Number(age)) || Number(age) <= 0 || Number(age) > 150) {
+      window.alert("A idade deve ser um número válido entre 1 e 150!");
+      return;
+    }
+    if (email === "") {
+      window.alert("Por favor, preencha o campo Email!");
+      return;
+    }
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      window.alert("Por favor, insira um email válido!");
+      return;
+    }
+    if (password === "") {
+      window.alert("Por favor, preencha o campo Senha!");
+      return;
+    }
+    if (password.length < 6) {
+      window.alert("A senha deve ter no mínimo 6 caracteres!");
+      return;
+    }
+
     try {
       await api.post("/users", {
-        name: inputName.current.value,
-        age: Number(inputAge.current.value),
-        email: inputEmail.current.value,
-        password: passwordRef.current.value,
+        name,
+        age: Number(age),
+        email,
+        password,
       });
       alert("User created with successfully");
+      inputName.current.value = "";
+      inputAge.current.value = "";
+      inputEmail.current.value = "";
+      passwordRef.current.value = "";
       navigate("/login");
     } catch (error) {
       console.error("Ops, algo deu errado 😕" + error);
     }
     fetchUsers();
-    inputName.current.value = "";
-    inputAge.current.value = "";
-    inputEmail.current.value = "";
-    passwordRef.current.value = "";
   };
 
   //Buscar usuário específico selecionado
