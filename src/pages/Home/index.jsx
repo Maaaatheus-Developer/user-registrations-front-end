@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./style.css";
+import styles from "./style.module.css";
 import Trashcan from "../../assets/trashcan-icon-red-small.png";
 import Pencil from "../../assets/pencil.png";
 import api from "../../services/api";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [users, setUsers] = useState([]);
@@ -10,14 +11,20 @@ const Home = () => {
   const inputName = useRef(null);
   const inputAge = useRef(null);
   const inputEmail = useRef(null);
+  const passwordRef = useRef(null);
+  const navigate = useNavigate();
   const [userID, setUserId] = useState(null);
+  const token = localStorage.getItem("token");
 
   //Buscar usuários
   const fetchUsers = async () => {
     try {
-      const response = await api.get("/users");
+      const response = await api.get("/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = response.data;
-      setUsers(data);
+      const user = data.users;
+      setUsers(user);
     } catch (error) {
       console.error("Erro", error);
     }
@@ -26,7 +33,9 @@ const Home = () => {
   //Deletar usuários
   const deleteUsers = async (id) => {
     try {
-      await api.delete(`users/${id}`);
+      await api.delete(`users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       alert(`User successfully deleted.`);
     } catch (error) {
       console.error(error);
@@ -39,12 +48,14 @@ const Home = () => {
     try {
       await api.post("/users", {
         name: inputName.current.value,
-        age: inputAge.current.value,
+        age: Number(inputAge.current.value),
         email: inputEmail.current.value,
+        password: passwordRef.current.value,
       });
       alert("User created with successfully");
+      navigate("/login");
     } catch (error) {
-      console.log("Ops, algo deu errado 😕" + error);
+      console.error("Ops, algo deu errado 😕" + error);
     }
     fetchUsers();
     inputName.current.value = "";
@@ -55,7 +66,9 @@ const Home = () => {
   //Buscar usuário específico selecionado
   const searchUser = async (id) => {
     try {
-      const res = await api.get(`/users/${id}`);
+      const res = await api.get(`/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.data;
       inputName.current.value = data.name;
       inputAge.current.value = data.age;
@@ -76,9 +89,10 @@ const Home = () => {
   // Atualizar usuários
   const updateUsers = async (e) => {
     const id = userID;
-    console.log(id);
     try {
       await api.put(`/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+
         name: inputName.current.value,
         age: inputAge.current.value,
         email: inputEmail.current.value,
@@ -100,9 +114,11 @@ const Home = () => {
     const loadUsers = async () => {
       try {
         const response = await api.get("/users", {
+          headers: { Authorization: `Bearer ${token}` },
           signal: controller.signal, //Sinal enviado para a requisição
         });
-        setUsers(response.data);
+        const user = response.data.users;
+        setUsers(user);
       } catch (error) {
         console.error("Erro" + error);
       }
@@ -111,13 +127,13 @@ const Home = () => {
     return () => {
       controller.abort(); // Isso cancela TODAS as operações ligadas ao signal
     };
-  }, []);
+  }, [token]);
 
   return (
-    <div className="container">
+    <div className={styles.container}>
       {!showEditForm ? (
-        <form>
-          <h1>Cadastro de Usuários</h1>
+        <form className={styles.formHome}>
+          <h1 className={styles.h1Home}>Cadastro de Usuários</h1>
           <input placeholder="Nome" name="name" type="text" ref={inputName} />
           <input placeholder="Idade" name="age" type="number" ref={inputAge} />
           <input
@@ -131,8 +147,8 @@ const Home = () => {
           </button>
         </form>
       ) : (
-        <form>
-          <h1>Atualizar Usuário</h1>
+        <form className={styles.formHome}>
+          <h1 className={styles.h1Home}>Atualizar Usuário</h1>
           <input placeholder="Nome" name="name" type="text" ref={inputName} />
           <input placeholder="Idade" name="age" type="number" ref={inputAge} />
           <input
@@ -148,7 +164,7 @@ const Home = () => {
       )}
 
       {users.map((user) => (
-        <div key={user.id} className="card">
+        <div key={user.id} className={styles.card}>
           <div>
             <p>
               Nome: <span>{user.name}</span>
@@ -160,7 +176,7 @@ const Home = () => {
               Email: <span>{user.email}</span>
             </p>
           </div>
-          <div className="buttons">
+          <div className={styles.buttons}>
             <button onClick={() => deleteUsers(user.id)}>
               <img src={Trashcan} width={35} alt="Excluir" />
             </button>
